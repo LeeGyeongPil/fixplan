@@ -153,20 +153,13 @@ flowchart TD
 5. **KEV·EPSS** — 해당 알림이 있을 때만 조회해 순서를 정합니다.
 6. **보고서** — Markdown 또는 JSON.
 
-## 다른 도구와 비교
-| | fixplan | osv-scanner | Dependabot / Renovate | pip-audit |
-|---|---|---|---|---|
-| 알림 찾기 | OSV 데이터 사용 | OSV 데이터 사용, 지원 생태계·기능이 더 넓음 | 알림 기반 PR 생성 | PyPI(Python) 전용 |
-| 최소 안전 버전 계산 | 패키지의 모든 알림을 한 번에 만족하는 버전 | 실험 기능(guided remediation)이 있음 | 도구마다 다름 | 수정 버전 표시 |
-| 런타임(PHP·Node·Python) 제약 고려 | 후보마다 확인, 막히면 이유 설명 | 설정에 따라 다름 | Renovate는 `constraintsFiltering` 옵션이 있음 | 해당 없음 |
-| KEV·EPSS 우선순위 | 기본 정렬 기준 | 별도 도구 필요 | 별도 도구 필요 | 아니오 |
-| PR 자동 생성·lockfile 수정 | 안 함(명령 제안만) | 일부 | 예 | 일부 |
-| 지원 범위 | Composer·PyPI·npm | 훨씬 많음 | 많음 | Python |
+## 언제 쓰나
+여러 알림을 한 번에 없애는 최소 버전과 런타임(PHP·Node·Python) 제약을 확인하거나, KEV·EPSS 순으로 무엇부터 고칠지 정할 때 fixplan을 씁니다. fixplan은 명령만 제안하며 PR 생성이나 lockfile 수정은 하지 않습니다.
 
-fixplan은 "무엇을 어느 버전으로 올릴지 정하는 단계"만 다룹니다. 자동 PR이 필요하면 Dependabot·Renovate가, 폭넓은 생태계 스캔이 필요하면 osv-scanner가 더 알맞습니다. 비교는 각 도구의 공개 문서를 읽고 정리한 것이라 최신 기능과 다를 수 있습니다.
+자동 PR이 필요하면 [Dependabot](https://docs.github.com/en/code-security/dependabot)이나 [Renovate](https://docs.renovatebot.com/)를, 더 넓은 생태계 스캔이 필요하면 [osv-scanner](https://google.github.io/osv-scanner/)를, Python만 다루면 [pip-audit](https://github.com/pypa/pip-audit)를 살펴보세요.
 
 ## 지원 범위와 로드맵
-**M1(이 버전, 0.1.0)**: Composer·PyPI·npm, 판정 4가지, naive fix 비교, 런타임 차단 설명, KEV·EPSS 정렬, Markdown·JSON, `--fail-on`.
+**M1(0.1.0부터)**: Composer·PyPI·npm, 판정 4가지, naive fix 비교, 런타임 차단 설명, KEV·EPSS 정렬, Markdown·JSON, `--fail-on`.
 
 한계(정직하게):
 - 명령은 제안일 뿐이고, 전이 의존성용 명령(`composer update --with`, npm `overrides`, `uv lock --upgrade-package`)은 실제 프로젝트에서 실행해 보지 않았습니다.
