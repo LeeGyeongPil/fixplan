@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 — 2026-11-10
+
+Documentation only; no code change.
+
+- README: replaced the comparison table with a short "언제 쓰나" (when to use) section.
+
 ## 0.1.1 — 2026-11-10
 
 Documentation and security notice only; no code change.
