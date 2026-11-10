@@ -1,0 +1,35 @@
+# synthetic fixture
+version = 1
+revision = 3
+requires-python = ">=3.11"
+
+[[package]]
+name = "Flask"
+version = "3.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "werkzeug" },
+]
+
+[[package]]
+name = "werkzeug"
+version = "3.0.1"
+source = { registry = "https://pypi.org/simple" }
+
+[[package]]
+name = "pytest"
+version = "8.0.0"
+source = { registry = "https://pypi.org/simple" }
+
+[[package]]
+name = "synthetic-app"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "flask" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]

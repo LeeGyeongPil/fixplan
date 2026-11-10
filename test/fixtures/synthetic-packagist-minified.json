@@ -1,0 +1,22 @@
+{
+  "minified": "composer/2.0",
+  "packages": {
+    "acme/http": [
+      {
+        "name": "acme/http",
+        "version": "2.1.0",
+        "version_normalized": "2.1.0.0",
+        "require": { "php": "^8.1", "psr/log": "^3.0" },
+        "suggest": { "ext-curl": "faster transport" }
+      },
+      { "version": "2.0.0", "version_normalized": "2.0.0.0" },
+      {
+        "version": "1.9.0",
+        "version_normalized": "1.9.0.0",
+        "require": { "php": "^7.4 || ^8.0" },
+        "suggest": "__unset"
+      },
+      { "version": "1.8.0", "version_normalized": "1.8.0.0", "require": "__unset" }
+    ]
+  }
+}

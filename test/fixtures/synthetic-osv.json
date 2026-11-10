@@ -1,0 +1,55 @@
+[
+  {
+    "id": "SYNTH-VERSIONS-ONLY",
+    "summary": "synthetic: affected list without ranges",
+    "affected": [
+      { "package": { "ecosystem": "npm", "name": "demo-pkg" }, "versions": ["1.2.3", "1.2.4"] }
+    ]
+  },
+  {
+    "id": "SYNTH-LAST-AFFECTED",
+    "summary": "synthetic: no fix yet, last_affected only",
+    "affected": [
+      {
+        "package": { "ecosystem": "npm", "name": "demo-pkg" },
+        "ranges": [{ "type": "ECOSYSTEM", "events": [{ "introduced": "2.0.0" }, { "last_affected": "2.3.0" }] }]
+      }
+    ]
+  },
+  {
+    "id": "SYNTH-MULTI-RANGE",
+    "summary": "synthetic: three branches in one range list, events out of order",
+    "affected": [
+      {
+        "package": { "ecosystem": "npm", "name": "demo-pkg" },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              { "introduced": "3.4.0" },
+              { "fixed": "3.5.1" },
+              { "introduced": "0" },
+              { "fixed": "3.0.2" },
+              { "introduced": "3.2.0" },
+              { "fixed": "3.3.5" }
+            ]
+          }
+        ]
+      },
+      {
+        "package": { "ecosystem": "PyPI", "name": "demo-pkg" },
+        "ranges": [{ "type": "ECOSYSTEM", "events": [{ "introduced": "0" }, { "fixed": "9.9.9" }] }]
+      }
+    ]
+  },
+  {
+    "id": "SYNTH-GIT-ONLY",
+    "summary": "synthetic: GIT range is commit based and must be ignored for version checks",
+    "affected": [
+      {
+        "package": { "ecosystem": "npm", "name": "demo-pkg" },
+        "ranges": [{ "type": "GIT", "events": [{ "introduced": "0" }, { "fixed": "abc123" }] }]
+      }
+    ]
+  }
+]
