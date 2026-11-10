@@ -186,6 +186,8 @@ fixplan은 "무엇을 어느 버전으로 올릴지 정하는 단계"만 다룹�
 | `npm warn Unknown user config "python"` | 개인 npm 설정에 `python`이 있음(fixplan과 무관) | 무시하거나 `.npmrc`에서 제거 |
 | `npm warn EBADENGINE` 경고(npm 은 기본으로 경고만 내고 계속 설치함), 또는 실행 오류 | Node가 24.10.0(`engines` 요구)보다 오래됨 | Node 24.10.0 이상으로 올리기 |
 
+> 저장소에서 `examples/mixed-shop` 또는 `test/fixtures/lockfiles` 경로의 Dependabot 취약점 알림이 보이면: 연습용 입력이라 알려진 취약 버전을 일부러 고정한 것입니다(설치·배포되지 않음, [SECURITY.md](SECURITY.md) 참고). 알림은 "Vulnerable code is not actually used"(사용하지 않음) 사유로 닫고 버전은 올리지 마세요 — 예제 출력이 이 버전에 의존합니다.
+
 ## 개발·기여
 ```bash
 npm ci

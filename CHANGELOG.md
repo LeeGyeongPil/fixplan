@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 — 2026-11-10
+
+Documentation and security notice only; no code change.
+
+- `SECURITY.md` and README explain that `examples/mixed-shop/` and `test/fixtures/lockfiles/` pin known-vulnerable versions on purpose, list the pinned versions per path, and say to dismiss Dependabot alerts with "Vulnerable code is not actually used".
+
 ## 0.1.0 — 2026-11-10
 
 First milestone (M1).

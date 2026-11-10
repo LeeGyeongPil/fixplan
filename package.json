@@ -1,6 +1,6 @@
 {
   "name": "fixplan",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Turn vulnerability alerts into a fix plan: minimal safe upgrade per package across Composer, PyPI and npm, checked against your PHP/Node/Python runtime and ranked by KEV and EPSS.",
   "license": "MIT",
   "author": "LeeGyeongPil",
