@@ -1,0 +1,52 @@
+{
+  "name": "fixplan",
+  "version": "0.1.0",
+  "description": "Turn vulnerability alerts into a fix plan: minimal safe upgrade per package across Composer, PyPI and npm, checked against your PHP/Node/Python runtime and ranked by KEV and EPSS.",
+  "license": "MIT",
+  "author": "LeeGyeongPil",
+  "type": "module",
+  "bin": {
+    "fixplan": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "snapshot",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24.10.0"
+  },
+  "scripts": {
+    "start": "node src/cli.ts scan examples/mixed-shop --offline",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json",
+    "compile": "tsc -p tsconfig.build.json"
+  },
+  "keywords": [
+    "security",
+    "vulnerability",
+    "osv",
+    "kev",
+    "epss",
+    "composer",
+    "pypi",
+    "npm",
+    "dependencies",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeeGyeongPil/fixplan.git"
+  },
+  "dependencies": {
+    "@renovatebot/pep440": "6.0.0",
+    "semver": "7.8.6",
+    "smol-toml": "1.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@types/semver": "7.8.0",
+    "typescript": "7.0.2"
+  }
+}

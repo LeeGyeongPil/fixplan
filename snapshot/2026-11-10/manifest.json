@@ -1,0 +1,89 @@
+{
+  "recorded": "2026-11-10",
+  "note": "offline snapshot recorded 2026-11-10 — practice data, not current advisories",
+  "sources": {
+    "osv": "github/advisory-database OSV files (raw.githubusercontent.com), advisory list per package from api.github.com/advisories",
+    "npm": "registry.npmjs.org (Accept: application/vnd.npm.install-v1+json), engines/deprecated only",
+    "pypi": "pypi.org/pypi/<name>/json, per-file requires_python/yanked only",
+    "packagist": "Packagist p2 minified format excerpt assembled from guzzle tag composer.json files (raw.githubusercontent.com)",
+    "kev": "cisagov/kev-data mirror (raw.githubusercontent.com), excerpt",
+    "epss": "epss field of api.github.com/advisories"
+  },
+  "packages": {
+    "Packagist": {
+      "guzzlehttp/guzzle": [
+        "GHSA-25mq-v84q-4j7r",
+        "GHSA-32rq-jhr7-m3hh",
+        "GHSA-3fvr-2jw6-crq4",
+        "GHSA-94pj-82f3-465w",
+        "GHSA-cwmx-hcrq-mhc3",
+        "GHSA-cwxw-98qj-8qjx",
+        "GHSA-f283-ghqc-fg79",
+        "GHSA-f2wf-25xc-69c9",
+        "GHSA-f7vp-7xgx-4w4r",
+        "GHSA-g446-98w2-8p5w",
+        "GHSA-h95v-h523-3mw8",
+        "GHSA-mjrx-74jh-7xgw",
+        "GHSA-mqq9-gxg5-m58g",
+        "GHSA-q559-8m2m-g699",
+        "GHSA-v5mv-p594-2x33",
+        "GHSA-w248-ffj2-4v5q",
+        "GHSA-wm3w-8rrp-j577",
+        "GHSA-wpwq-4j6v-78m3"
+      ],
+      "guzzlehttp/promises": []
+    },
+    "npm": {
+      "lodash": [
+        "GHSA-29mw-wpgm-hmr9",
+        "GHSA-35jh-r3h4-6jhm",
+        "GHSA-4xc9-xhrj-v574",
+        "GHSA-f23m-r3pf-42rh",
+        "GHSA-fvqr-27wr-82fm",
+        "GHSA-jf85-cpcp-j695",
+        "GHSA-p6mc-m468-83gw",
+        "GHSA-r5fr-rjxr-66jc",
+        "GHSA-x5rq-j2xg-h7qm",
+        "GHSA-xxjr-mmjv-4gpg"
+      ],
+      "systeminformation": [
+        "GHSA-2m8v-572m-ff2v",
+        "GHSA-3f7j-7jwc-fxfj",
+        "GHSA-4v2w-h9jm-mqjg",
+        "GHSA-4vjg-vx72-qq4g",
+        "GHSA-5vv4-hvf7-2h46",
+        "GHSA-5xpp-75jx-m839",
+        "GHSA-7648-jmwf-vw7j",
+        "GHSA-8j36-q8x7-pm6q",
+        "GHSA-94xh-2fmc-xf5j",
+        "GHSA-9c88-49p5-5ggf",
+        "GHSA-cvv5-9h9w-qp2m",
+        "GHSA-fj59-f6c3-3vw4",
+        "GHSA-gx6r-qc2v-3p3v",
+        "GHSA-hvx9-hwr7-wjj9",
+        "GHSA-jff2-qjw8-5476",
+        "GHSA-m57p-p67h-mq74",
+        "GHSA-wphj-fx3q-84ch"
+      ],
+      "ms": [
+        "GHSA-3fx5-fwvr-xrjg",
+        "GHSA-w9mr-4mfr-499f"
+      ]
+    },
+    "PyPI": {
+      "jinja2": [
+        "GHSA-462w-v97r-4m45",
+        "GHSA-8r7q-cvjq-x353",
+        "GHSA-cpwx-vrp4-4pq7",
+        "GHSA-fqh9-2qgg-h84h",
+        "GHSA-g3rq-g295-4j3m",
+        "GHSA-gmj6-6f8f-6699",
+        "GHSA-h5c8-rqwp-cp95",
+        "GHSA-h75v-3vvj-5mfj",
+        "GHSA-hj2j-77xm-mc5v",
+        "GHSA-q2x7-8rv6-6q7h"
+      ],
+      "markupsafe": []
+    }
+  }
+}

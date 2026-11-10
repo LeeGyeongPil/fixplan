@@ -1,0 +1,28 @@
+# Trimmed example lockfile for fixplan: sdist/wheel entries are omitted.
+version = 1
+revision = 3
+requires-python = ">=3.10"
+
+[[package]]
+name = "jinja2"
+version = "3.1.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+
+[[package]]
+name = "markupsafe"
+version = "2.1.5"
+source = { registry = "https://pypi.org/simple" }
+
+[[package]]
+name = "clean-worker"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "jinja2" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "jinja2", specifier = "==3.1.6" }]

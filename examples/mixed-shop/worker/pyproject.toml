@@ -1,0 +1,8 @@
+[project]
+name = "mixed-shop-worker"
+version = "0.1.0"
+description = "Fictional example project for fixplan (not a real application)"
+requires-python = ">=3.10"
+dependencies = [
+    "jinja2==3.1.2",
+]

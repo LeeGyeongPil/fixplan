@@ -1,0 +1,15 @@
+{
+    "name": "example/clean-api",
+    "description": "Fictional example project for fixplan (not a real application)",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "guzzlehttp/guzzle": "^7.4"
+    },
+    "config": {
+        "platform": {
+            "php": "8.1"
+        }
+    }
+}
