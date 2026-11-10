@@ -1,0 +1,28 @@
+# 네트워크 없이(오프라인 스냅샷·픽스처) 전체 흐름을 검증한다.
+# Node 24.10.0 은 지원 하한(@renovatebot/pep440 6.0.0 의 engines), 26 은 현재 버전.
+name: ci
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"   # 매주 월요일 — 의존성·런타임이 바뀌어 깨지지 않았는지 정기 확인
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["24.10.0", "26"]
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run compile && git diff --exit-code -- dist   # 커밋된 dist/ 가 소스와 같은지(전역 git 설치가 이 dist/ 를 씀)
+      - run: npm test
+      - run: npm start         # 오프라인 연습 모드 보고서가 실제로 나오는지
+      - run: node dist/cli.js scan examples/clean --offline --fail-on any
