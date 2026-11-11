@@ -1,0 +1,28 @@
+{
+  "id": "PYSEC-2099-1",
+  "aliases": [
+    "CVE-2099-0001"
+  ],
+  "summary": "synthetic: PYSEC twin of GHSA-aaaa-bbbb-cccc",
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "npm",
+        "name": "demo-pkg"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "1.0.1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

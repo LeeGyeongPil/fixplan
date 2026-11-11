@@ -1,0 +1,18 @@
+{
+  "name": "solo-pkg",
+  "dist-tags": {
+    "latest": "2.0.1"
+  },
+  "versions": {
+    "2.0.0": {
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "2.0.1": {
+      "engines": {
+        "node": ">=18"
+      }
+    }
+  }
+}

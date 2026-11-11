@@ -1,0 +1,556 @@
+{
+  "tool": "fixplan",
+  "version": "@VERSION@",
+  "mode": "offline",
+  "snapshot": {
+    "recorded": "2026-11-10",
+    "note": "offline snapshot recorded 2026-11-10 — practice data, not current advisories"
+  },
+  "data_sources": {
+    "osv": "github/advisory-database OSV files (raw.githubusercontent.com), advisory list per package from api.github.com/advisories",
+    "npm": "registry.npmjs.org (Accept: application/vnd.npm.install-v1+json), engines/deprecated only",
+    "pypi": "pypi.org/pypi/<name>/json, per-file requires_python/yanked only",
+    "packagist": "Packagist p2 minified format excerpt assembled from guzzle tag composer.json files (raw.githubusercontent.com)",
+    "kev": "cisagov/kev-data mirror (raw.githubusercontent.com), excerpt",
+    "epss": "epss field of api.github.com/advisories"
+  },
+  "path": "examples/mixed-shop",
+  "lockfiles": [
+    {
+      "path": "api/composer.lock",
+      "kind": "composer.lock",
+      "packages": 2,
+      "runtime": {
+        "name": "php",
+        "version": "8.1",
+        "source": "composer.json config.platform.php (estimated)",
+        "checked": true
+      }
+    },
+    {
+      "path": "web/package-lock.json",
+      "kind": "package-lock.json",
+      "packages": 3,
+      "runtime": {
+        "name": "node",
+        "version": "18.0.0",
+        "source": "package.json engines.node lower bound (estimated)",
+        "checked": true
+      }
+    },
+    {
+      "path": "worker/uv.lock",
+      "kind": "uv.lock",
+      "packages": 2,
+      "runtime": {
+        "name": "python",
+        "version": "3.10",
+        "source": "pyproject.toml requires-python lower bound (estimated)",
+        "checked": true
+      }
+    }
+  ],
+  "packages_scanned": 7,
+  "packages_unchecked": 0,
+  "summary": {
+    "vulnerable": 4,
+    "kev": 1,
+    "fixable-in-major": 4,
+    "major-upgrade": 0,
+    "runtime-blocked": 0,
+    "no-patch": 0
+  },
+  "findings": [
+    {
+      "ecosystem": "npm",
+      "name": "systeminformation",
+      "version": "5.3.0",
+      "direct": true,
+      "lockfile": "web/package-lock.json",
+      "advisories": [
+        {
+          "id": "GHSA-2m8v-572m-ff2v",
+          "aliases": [
+            "CVE-2021-21315"
+          ],
+          "summary": "Command Injection Vulnerability",
+          "severity": "HIGH",
+          "kev": true,
+          "epss": 0.90675,
+          "fixed": "5.3.1"
+        },
+        {
+          "id": "GHSA-3f7j-7jwc-fxfj",
+          "aliases": [
+            "CVE-2026-116576"
+          ],
+          "summary": "systeminformation vulnerable to Windows command injection in services() through Unicode quotation marks",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.00145,
+          "fixed": "5.33.16"
+        },
+        {
+          "id": "GHSA-4vjg-vx72-qq4g",
+          "aliases": [
+            "CVE-2026-116673"
+          ],
+          "summary": "systeminformation has path traversal in Linux networkStats() that allows symlink-based file disclosure outside /sys/class/net",
+          "severity": "LOW",
+          "kev": false,
+          "epss": 0.00127,
+          "fixed": "5.33.14"
+        },
+        {
+          "id": "GHSA-5vv4-hvf7-2h46",
+          "aliases": [
+            "CVE-2026-26318"
+          ],
+          "summary": "Command Injection via Unsanitized `locate` Output in `versions()` — systeminformation",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01278,
+          "fixed": "5.31.0"
+        },
+        {
+          "id": "GHSA-5xpp-75jx-m839",
+          "aliases": [
+            "CVE-2026-50289"
+          ],
+          "summary": "systeminformation: OS command injection in networkInterfaces() via interfaces(5) source-directive path on Linux",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.02184,
+          "fixed": "5.31.7"
+        },
+        {
+          "id": "GHSA-7648-jmwf-vw7j",
+          "aliases": [
+            "CVE-2026-116674"
+          ],
+          "summary": "systeminformation has prototype pollution in `networkStats()` via the interface name",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00287,
+          "fixed": "5.33.13"
+        },
+        {
+          "id": "GHSA-9c88-49p5-5ggf",
+          "aliases": [
+            "CVE-2026-26280"
+          ],
+          "summary": "Systeminformation has a Command Injection via unsanitized interface parameter in wifi.js retry path",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01371,
+          "fixed": "5.30.8"
+        },
+        {
+          "id": "GHSA-cvv5-9h9w-qp2m",
+          "aliases": [
+            "CVE-2024-56334"
+          ],
+          "summary": "Systeminformation has command injection vulnerability in getWindowsIEEE8021x (SSID)",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.00699,
+          "fixed": "5.23.7"
+        },
+        {
+          "id": "GHSA-gx6r-qc2v-3p3v",
+          "aliases": [
+            "CVE-2023-42810"
+          ],
+          "summary": "systeminformation SSID Command Injection Vulnerability",
+          "severity": "CRITICAL",
+          "kev": false,
+          "epss": 0.02217,
+          "fixed": "5.21.7"
+        },
+        {
+          "id": "GHSA-hvx9-hwr7-wjj9",
+          "aliases": [
+            "CVE-2026-44724"
+          ],
+          "summary": "Systeminformation vulnerable to Linux command injection in networkInterfaces() via unsanitized NetworkManager connection profile name",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.00915,
+          "fixed": "5.31.6"
+        },
+        {
+          "id": "GHSA-jff2-qjw8-5476",
+          "aliases": [
+            "CVE-2021-21388"
+          ],
+          "summary": "Command Injection Vulnerability in systeminformation",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01854,
+          "fixed": "5.6.4"
+        },
+        {
+          "id": "GHSA-wphj-fx3q-84ch",
+          "aliases": [
+            "CVE-2025-68154"
+          ],
+          "summary": "systeminformation has a Command Injection vulnerability in fsSize() function on Windows",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.12989,
+          "fixed": "5.27.14"
+        }
+      ],
+      "verdict": "fixable-in-major",
+      "minimal_fix": "5.33.16",
+      "naive_fix": "5.33.16",
+      "still_affected_by": [],
+      "runtime": {
+        "name": "node",
+        "version": "18.0.0",
+        "source": "package.json engines.node lower bound (estimated)",
+        "checked": true
+      },
+      "blocked_reason": null,
+      "notes": [],
+      "command": "npm install systeminformation@5.33.16",
+      "priority": 1
+    },
+    {
+      "ecosystem": "npm",
+      "name": "lodash",
+      "version": "4.17.15",
+      "direct": true,
+      "lockfile": "web/package-lock.json",
+      "advisories": [
+        {
+          "id": "GHSA-29mw-wpgm-hmr9",
+          "aliases": [
+            "CVE-2020-28500"
+          ],
+          "summary": "Regular Expression Denial of Service (ReDoS) in lodash",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.07336,
+          "fixed": "4.17.21"
+        },
+        {
+          "id": "GHSA-35jh-r3h4-6jhm",
+          "aliases": [
+            "CVE-2021-23337"
+          ],
+          "summary": "Command Injection in lodash",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.21333,
+          "fixed": "4.17.21"
+        },
+        {
+          "id": "GHSA-p6mc-m468-83gw",
+          "aliases": [
+            "CVE-2020-8203"
+          ],
+          "summary": "Prototype Pollution in lodash",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.05213,
+          "fixed": "4.17.19"
+        },
+        {
+          "id": "GHSA-r5fr-rjxr-66jc",
+          "aliases": [
+            "CVE-2026-4800"
+          ],
+          "summary": "lodash vulnerable to Code Injection via `_.template` imports key names",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.02808,
+          "fixed": "4.18.0"
+        },
+        {
+          "id": "GHSA-xxjr-mmjv-4gpg",
+          "aliases": [
+            "CVE-2025-13465"
+          ],
+          "summary": "Lodash has Prototype Pollution Vulnerability in `_.unset`, `_.omit`, and `_.pullAt` functions",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.01823,
+          "fixed": "4.17.23"
+        }
+      ],
+      "verdict": "fixable-in-major",
+      "minimal_fix": "4.18.1",
+      "naive_fix": "4.18.0",
+      "still_affected_by": [
+        "GHSA-f23m-r3pf-42rh"
+      ],
+      "runtime": {
+        "name": "node",
+        "version": "18.0.0",
+        "source": "package.json engines.node lower bound (estimated)",
+        "checked": true
+      },
+      "blocked_reason": null,
+      "notes": [],
+      "command": "npm install lodash@4.18.1",
+      "priority": 2
+    },
+    {
+      "ecosystem": "Packagist",
+      "name": "guzzlehttp/guzzle",
+      "version": "7.4.0",
+      "direct": true,
+      "lockfile": "api/composer.lock",
+      "advisories": [
+        {
+          "id": "GHSA-25mq-v84q-4j7r",
+          "aliases": [
+            "CVE-2022-31090"
+          ],
+          "summary": "CURLOPT_HTTPAUTH option not cleared on change of origin",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01916,
+          "fixed": "7.4.5"
+        },
+        {
+          "id": "GHSA-94pj-82f3-465w",
+          "aliases": [
+            "CVE-2026-67339"
+          ],
+          "summary": "Guzzle: Proxy-Authorization headers can be sent to origin servers",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00372,
+          "fixed": "7.14.2"
+        },
+        {
+          "id": "GHSA-cwmx-hcrq-mhc3",
+          "aliases": [
+            "CVE-2022-29248"
+          ],
+          "summary": "Cross-domain cookie leakage in Guzzle",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01351,
+          "fixed": "7.4.3"
+        },
+        {
+          "id": "GHSA-cwxw-98qj-8qjx",
+          "aliases": [
+            "CVE-2026-55767"
+          ],
+          "summary": "guzzlehttp/guzzle: Dot-Only Cookie Domains Match All Hosts",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00211,
+          "fixed": "7.12.1"
+        },
+        {
+          "id": "GHSA-f283-ghqc-fg79",
+          "aliases": [
+            "CVE-2026-67353"
+          ],
+          "summary": "Guzzle: Unbounded response cookies risk denial of service",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00418,
+          "fixed": "7.15.1"
+        },
+        {
+          "id": "GHSA-f2wf-25xc-69c9",
+          "aliases": [
+            "CVE-2022-31042"
+          ],
+          "summary": "Failure to strip the Cookie header on change in host or HTTP downgrade",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01992,
+          "fixed": "7.4.4"
+        },
+        {
+          "id": "GHSA-f7vp-7xgx-4w4r",
+          "aliases": [
+            "CVE-2026-69245"
+          ],
+          "summary": "Guzzle: Noncanonical cookie domain keeps subdomain scope",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00199,
+          "fixed": "7.15.2"
+        },
+        {
+          "id": "GHSA-g446-98w2-8p5w",
+          "aliases": [
+            "CVE-2026-59883"
+          ],
+          "summary": "Guzzle: Cookie Disclosure and Injection via IP-Address Domains",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00167,
+          "fixed": "7.12.3"
+        },
+        {
+          "id": "GHSA-h95v-h523-3mw8",
+          "aliases": [
+            "CVE-2026-67354"
+          ],
+          "summary": "Guzzle: URI fragments disclosed in redirect Referer headers",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00372,
+          "fixed": "7.15.1"
+        },
+        {
+          "id": "GHSA-q559-8m2m-g699",
+          "aliases": [
+            "CVE-2022-31091"
+          ],
+          "summary": "Change in port should be considered a change in origin",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01565,
+          "fixed": "7.4.5"
+        },
+        {
+          "id": "GHSA-v5mv-p594-2x33",
+          "aliases": [
+            "CVE-2026-69246"
+          ],
+          "summary": "Guzzle: Noncanonical host can bypass host-based checks",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.0037,
+          "fixed": "7.15.2"
+        },
+        {
+          "id": "GHSA-w248-ffj2-4v5q",
+          "aliases": [
+            "CVE-2022-31043"
+          ],
+          "summary": "Fix failure to strip Authorization header on HTTP downgrade",
+          "severity": "HIGH",
+          "kev": false,
+          "epss": 0.01992,
+          "fixed": "7.4.4"
+        },
+        {
+          "id": "GHSA-wm3w-8rrp-j577",
+          "aliases": [
+            "CVE-2026-67355"
+          ],
+          "summary": "Guzzle: Host-only cookie scope is not preserved",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00366,
+          "fixed": "7.15.1"
+        },
+        {
+          "id": "GHSA-wpwq-4j6v-78m3",
+          "aliases": [
+            "CVE-2026-55568"
+          ],
+          "summary": "guzzlehttp/guzzle: Silent HTTPS-Proxy Downgrade to Cleartext",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00148,
+          "fixed": "7.12.1"
+        }
+      ],
+      "verdict": "fixable-in-major",
+      "minimal_fix": "7.15.2",
+      "naive_fix": "7.15.2",
+      "still_affected_by": [],
+      "runtime": {
+        "name": "php",
+        "version": "8.1",
+        "source": "composer.json config.platform.php (estimated)",
+        "checked": true
+      },
+      "blocked_reason": null,
+      "notes": [],
+      "command": "composer require \"guzzlehttp/guzzle:^7.15.2\"",
+      "priority": 3
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "jinja2",
+      "version": "3.1.2",
+      "direct": true,
+      "lockfile": "worker/uv.lock",
+      "advisories": [
+        {
+          "id": "GHSA-cpwx-vrp4-4pq7",
+          "aliases": [
+            "CVE-2025-27516"
+          ],
+          "summary": "Jinja2 vulnerable to sandbox breakout through attr filter selecting format method",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00507,
+          "fixed": "3.1.6"
+        },
+        {
+          "id": "GHSA-gmj6-6f8f-6699",
+          "aliases": [
+            "CVE-2024-56201"
+          ],
+          "summary": "Jinja has a sandbox breakout through malicious filenames",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00307,
+          "fixed": "3.1.5"
+        },
+        {
+          "id": "GHSA-h5c8-rqwp-cp95",
+          "aliases": [
+            "CVE-2024-22195"
+          ],
+          "summary": "Jinja vulnerable to HTML attribute injection when passing user input as keys to xmlattr filter",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00892,
+          "fixed": "3.1.3"
+        },
+        {
+          "id": "GHSA-h75v-3vvj-5mfj",
+          "aliases": [
+            "CVE-2024-34064"
+          ],
+          "summary": "Jinja vulnerable to HTML attribute injection when passing user input as keys to xmlattr filter",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00979,
+          "fixed": "3.1.4"
+        },
+        {
+          "id": "GHSA-q2x7-8rv6-6q7h",
+          "aliases": [
+            "CVE-2024-56326"
+          ],
+          "summary": "Jinja has a sandbox breakout through indirect reference to format method",
+          "severity": "MODERATE",
+          "kev": false,
+          "epss": 0.00522,
+          "fixed": "3.1.5"
+        }
+      ],
+      "verdict": "fixable-in-major",
+      "minimal_fix": "3.1.6",
+      "naive_fix": "3.1.6",
+      "still_affected_by": [],
+      "runtime": {
+        "name": "python",
+        "version": "3.10",
+        "source": "pyproject.toml requires-python lower bound (estimated)",
+        "checked": true
+      },
+      "blocked_reason": null,
+      "notes": [],
+      "command": "uv add \"jinja2>=3.1.6\"",
+      "priority": 4
+    }
+  ],
+  "warnings": []
+}

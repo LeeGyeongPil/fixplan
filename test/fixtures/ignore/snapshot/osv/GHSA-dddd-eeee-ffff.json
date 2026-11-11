@@ -1,0 +1,28 @@
+{
+  "id": "GHSA-dddd-eeee-ffff",
+  "aliases": [
+    "CVE-2099-0002"
+  ],
+  "summary": "synthetic: needs 1.1.0",
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "npm",
+        "name": "demo-pkg"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "1.1.0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

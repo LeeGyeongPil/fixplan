@@ -1,0 +1,11 @@
+{
+  "name": "ignore-fixture",
+  "version": "1.0.0",
+  "dependencies": {
+    "demo-pkg": "1.0.0",
+    "solo-pkg": "2.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

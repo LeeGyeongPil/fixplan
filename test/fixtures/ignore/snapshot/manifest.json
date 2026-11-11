@@ -1,0 +1,17 @@
+{
+  "recorded": "2099-01-01",
+  "note": "synthetic ignore fixture",
+  "sources": {},
+  "packages": {
+    "npm": {
+      "demo-pkg": [
+        "GHSA-aaaa-bbbb-cccc",
+        "PYSEC-2099-1",
+        "GHSA-dddd-eeee-ffff"
+      ],
+      "solo-pkg": [
+        "GHSA-gggg-hhhh-iiii"
+      ]
+    }
+  }
+}

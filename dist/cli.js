@@ -31,9 +31,11 @@ Output:
   --format md|json   default md
   --out <file>       write the report to a file instead of stdout
   --fail-on <list>   exit 1 if any finding matches: kev, fixable, any (comma separated)
+  --ignore <id>      skip an advisory by ID or alias (GHSA, CVE, PYSEC; repeatable or comma separated)
 
 Exit codes: 0 ok · 1 --fail-on matched · 2 input or network error`;
 const FAIL_ON = ["kev", "fixable", "any"];
+const IGNORE_ID = /^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9._:-]+$/;
 function toolVersion() {
     // src/ 와 dist/ 모두 package.json 한 단계 위
     const pkgPath = join(dirname(fileURLToPath(import.meta.url)), "..", "package.json");
@@ -73,6 +75,7 @@ export async function main(argv, io = defaultIo) {
                 format: { type: "string", default: "md" },
                 out: { type: "string" },
                 "fail-on": { type: "string" },
+                ignore: { type: "string", multiple: true },
                 verbose: { type: "boolean", default: false },
                 help: { type: "boolean", short: "h", default: false },
                 version: { type: "boolean", short: "v", default: false },
@@ -104,6 +107,19 @@ export async function main(argv, io = defaultIo) {
             if (failOn.length === 0)
                 throw new FixplanError("--fail-on needs a value (kev, fixable, any)");
         }
+        // --ignore 값 검사: 여러 번·쉼표 모두 허용, 형식이 틀리면 실행 전에 종료 코드 2
+        const ignore = [];
+        for (const group of values.ignore ?? []) {
+            const parts = group.split(",").map((s) => s.trim()).filter(Boolean);
+            if (parts.length === 0)
+                throw new FixplanError(`invalid --ignore id '${group}' (e.g. GHSA-xxxx-xxxx-xxxx, CVE-2021-21315)`);
+            for (const id of parts) {
+                if (!IGNORE_ID.test(id))
+                    throw new FixplanError(`invalid --ignore id '${id}' (e.g. GHSA-xxxx-xxxx-xxxx, CVE-2021-21315)`);
+                if (!ignore.includes(id))
+                    ignore.push(id);
+            }
+        }
         // 런타임 플래그 값 검사: 오타가 런타임 검사를 조용히 끄지 않도록 실행 전에 막는다
         for (const [flag, example] of [["php", "8.1"], ["node", "18"], ["python", "3.10"]]) {
             const v = values[flag];
@@ -120,6 +136,7 @@ export async function main(argv, io = defaultIo) {
                 kev: values["kev-url"] ?? io.env.FIXPLAN_KEV_URL,
                 epss: values["epss-url"] ?? io.env.FIXPLAN_EPSS_URL,
             },
+            ignore: ignore.length ? ignore : undefined,
             fetch: io.fetch,
             log: values.verbose ? (line) => io.stderr(`fixplan: ${line}\n`) : undefined,
         });

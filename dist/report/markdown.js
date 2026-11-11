@@ -55,7 +55,7 @@ export function renderMarkdown(result) {
     out.push(`Scanned ${result.lockfiles.length} lockfile(s), ${result.packages} package(s). Runtimes: ${runtimeLine(result)}`);
     out.push("");
     const s = result.summary;
-    out.push(`**Summary: ${s.vulnerable} vulnerable package(s)** — fixable-in-major: ${s["fixable-in-major"]} · major-upgrade: ${s["major-upgrade"]} · runtime-blocked: ${s["runtime-blocked"]} · no-patch: ${s["no-patch"]} · in CISA KEV: ${s.kev}`);
+    out.push(`**Summary: ${s.vulnerable} vulnerable package(s)** — fixable-in-major: ${s["fixable-in-major"]} · major-upgrade: ${s["major-upgrade"]} · runtime-blocked: ${s["runtime-blocked"]} · no-patch: ${s["no-patch"]} · in CISA KEV: ${s.kev}${result.ignored ? ` · ignored: ${result.ignored.length}` : ""}`);
     out.push("");
     // 스냅샷에 없는 패키지는 "안전"이 아니라 "확인 안 함" 이다 — 요약에서 분명히 말한다
     if (result.unchecked > 0) {
@@ -79,6 +79,15 @@ export function renderMarkdown(result) {
         out.push("");
         for (const f of result.findings)
             out.push(...detail(f));
+    }
+    if (result.ignored) {
+        out.push("## Ignored");
+        out.push("");
+        if (result.ignored.length === 0)
+            out.push(result.warnings.some((w) => w.startsWith("--ignore ")) ? "- none (see warnings)" : "- none (no effect on the result)");
+        for (const i of result.ignored)
+            out.push(`- ignored: ${i.id} (${i.ecosystem} ${i.name} ${i.version}, ${i.lockfile})${i.affects ? " — affects candidate versions only" : ""}`);
+        out.push("");
     }
     out.push("Notes: `no-patch` and EPSS `unknown` do not mean safe. Commands are suggestions — fixplan never edits lockfiles.");
     if (result.warnings.length) {

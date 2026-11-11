@@ -1,0 +1,12 @@
+{
+  "recorded": "2099-01-01",
+  "note": "synthetic: two lockfiles sharing one advisory, plus a candidate-only advisory",
+  "sources": {},
+  "packages": {
+    "npm": {
+      "pkg-shared": ["GHSA-shar-edaa-0001"],
+      "pkg-other": ["GHSA-shar-edaa-0001"],
+      "pkg-cand": ["GHSA-cand-0001-aaaa", "GHSA-cand-0002-bbbb"]
+    }
+  }
+}

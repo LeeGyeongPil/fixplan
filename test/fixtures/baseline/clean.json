@@ -1,0 +1,65 @@
+{
+  "tool": "fixplan",
+  "version": "@VERSION@",
+  "mode": "offline",
+  "snapshot": {
+    "recorded": "2026-11-10",
+    "note": "offline snapshot recorded 2026-11-10 — practice data, not current advisories"
+  },
+  "data_sources": {
+    "osv": "github/advisory-database OSV files (raw.githubusercontent.com), advisory list per package from api.github.com/advisories",
+    "npm": "registry.npmjs.org (Accept: application/vnd.npm.install-v1+json), engines/deprecated only",
+    "pypi": "pypi.org/pypi/<name>/json, per-file requires_python/yanked only",
+    "packagist": "Packagist p2 minified format excerpt assembled from guzzle tag composer.json files (raw.githubusercontent.com)",
+    "kev": "cisagov/kev-data mirror (raw.githubusercontent.com), excerpt",
+    "epss": "epss field of api.github.com/advisories"
+  },
+  "path": "examples/clean",
+  "lockfiles": [
+    {
+      "path": "api/composer.lock",
+      "kind": "composer.lock",
+      "packages": 2,
+      "runtime": {
+        "name": "php",
+        "version": "8.1",
+        "source": "composer.json config.platform.php (estimated)",
+        "checked": true
+      }
+    },
+    {
+      "path": "web/package-lock.json",
+      "kind": "package-lock.json",
+      "packages": 3,
+      "runtime": {
+        "name": "node",
+        "version": "18.0.0",
+        "source": "package.json engines.node lower bound (estimated)",
+        "checked": true
+      }
+    },
+    {
+      "path": "worker/uv.lock",
+      "kind": "uv.lock",
+      "packages": 2,
+      "runtime": {
+        "name": "python",
+        "version": "3.10",
+        "source": "pyproject.toml requires-python lower bound (estimated)",
+        "checked": true
+      }
+    }
+  ],
+  "packages_scanned": 7,
+  "packages_unchecked": 0,
+  "summary": {
+    "vulnerable": 0,
+    "kev": 0,
+    "fixable-in-major": 0,
+    "major-upgrade": 0,
+    "runtime-blocked": 0,
+    "no-patch": 0
+  },
+  "findings": [],
+  "warnings": []
+}

@@ -1,0 +1,28 @@
+{
+  "id": "GHSA-gggg-hhhh-iiii",
+  "aliases": [
+    "CVE-2099-0003"
+  ],
+  "summary": "synthetic: only advisory of solo-pkg",
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "npm",
+        "name": "solo-pkg"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "2.0.1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

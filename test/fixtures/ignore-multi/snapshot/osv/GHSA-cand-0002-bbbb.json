@@ -1,0 +1,8 @@
+{
+  "id": "GHSA-cand-0002-bbbb",
+  "aliases": ["CVE-2099-2002"],
+  "summary": "synthetic: does NOT hit 1.0.0, only the candidate 1.0.1 (fixed in 1.0.2)",
+  "affected": [
+    { "package": { "ecosystem": "npm", "name": "pkg-cand" }, "ranges": [{ "type": "SEMVER", "events": [{ "introduced": "1.0.1" }, { "fixed": "1.0.2" }] }] }
+  ]
+}

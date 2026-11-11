@@ -1,0 +1,9 @@
+{
+  "id": "GHSA-shar-edaa-0001",
+  "aliases": ["CVE-2099-1001"],
+  "summary": "synthetic: one record that hits pkg-shared and pkg-other",
+  "affected": [
+    { "package": { "ecosystem": "npm", "name": "pkg-shared" }, "ranges": [{ "type": "SEMVER", "events": [{ "introduced": "0" }, { "fixed": "1.0.1" }] }] },
+    { "package": { "ecosystem": "npm", "name": "pkg-other" }, "ranges": [{ "type": "SEMVER", "events": [{ "introduced": "0" }, { "fixed": "1.0.1" }] }] }
+  ]
+}

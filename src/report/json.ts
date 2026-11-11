@@ -16,6 +16,8 @@ export function renderJson(result: ScanResult, toolVersion: string): string {
     summary: result.summary,
     findings: result.findings,
     warnings: result.warnings,
+    // --ignore 를 줬을 때만 키가 생긴다(미지정이면 출력이 그대로)
+    ...(result.ignored ? { ignored: result.ignored } : {}),
   };
   return JSON.stringify(doc, null, 2) + "\n";
 }

@@ -1,0 +1,28 @@
+{
+  "id": "GHSA-aaaa-bbbb-cccc",
+  "aliases": [
+    "CVE-2099-0001"
+  ],
+  "summary": "synthetic: same CVE as the PYSEC record",
+  "affected": [
+    {
+      "package": {
+        "ecosystem": "npm",
+        "name": "demo-pkg"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            },
+            {
+              "fixed": "1.0.1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
