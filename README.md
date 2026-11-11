@@ -1,5 +1,7 @@
 # fixplan
 
+**한국어** | [English](README.en.md)
+
 > **English summary** — fixplan turns vulnerability alerts into a fix plan: for each vulnerable package it computes the minimal upgrade that clears *every* known advisory, checks it against your PHP / Node / Python runtime, and ranks the work by CISA KEV and EPSS. It reads `composer.lock`, `package-lock.json`, `uv.lock` and `requirements.txt` (M1: Composer, PyPI, npm; Maven is planned for M2). Try it with no network: `npx github:LeeGyeongPil/fixplan scan <path> --offline` (practice data recorded 2026-11-10); live mode has not been verified end to end yet.
 
 "알림이 떴는데, 그래서 어떤 버전으로 올리면 되지?"에 답해 주는 CLI입니다. 알림에 적힌 "고친 버전"만 따라 올리면 다른 알림이 남거나 런타임(PHP·Node·Python 버전)이 못 받는 경우가 있어서, 그 계산을 대신 해 줍니다.
