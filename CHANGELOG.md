@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-11-11
+
+- `--ignore <id>` on `fixplan scan`: skip an advisory by OSV id or alias (GHSA, CVE, PYSEC). Repeatable or comma separated, case-insensitive, exact match only.
+- A matched id removes the whole alias group (same id/aliases key as the de-duplication), and verdicts, minimal fix, priority, summary and `--fail-on` are computed from the remaining advisories.
+- Reports: Markdown gets ` · ignored: N` on the summary line and an `## Ignored` section; JSON gets a top-level `ignored` array. Both appear only when `--ignore` is used, so output without it is unchanged byte for byte.
+- An ignored advisory that only matters for candidate (fix) versions, so ignoring it can change the recommended version or `still_affected_by`, is listed too (`affects: "candidate-versions-only"` in JSON, a suffix in Markdown). The same id hitting several packages or lockfiles is excluded everywhere and listed once per package and lockfile.
+- An id that matches no advisory in the scan is a warning (in the report's `## Warnings` / JSON `warnings`, not stderr), not an error. A malformed id exits 2.
+
 ## 0.1.2 — 2026-11-10
 
 Documentation only; no code change.

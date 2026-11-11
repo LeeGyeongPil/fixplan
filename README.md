@@ -72,6 +72,7 @@ Scanned 3 lockfile(s), 7 package(s). Runtimes: php 8.1 (composer.json config.pla
 | `--format md\|json` | 출력 형식 (기본 md) | `--format json` |
 | `--out <file>` | 보고서를 파일로 저장 | `--out plan.md` |
 | `--fail-on kev,fixable,any` | 조건에 맞는 항목이 있으면 종료 코드 1 (CI용) | `--fail-on kev` |
+| `--ignore <ID>` | 알림을 ID 또는 별칭(GHSA·CVE·PYSEC)으로 제외. 여러 번 쓰거나 쉼표로 구분 | `--ignore CVE-2021-21315` |
 | `--verbose` | 진행 상황을 stderr로 | |
 | `--snapshot <dir>` | 다른 스냅샷 폴더 사용(`--offline`과 함께) | |
 | `--osv-url` `--kev-url` `--epss-url` | 데이터 주소 변경 | |
@@ -123,8 +124,21 @@ clean exit=0
 
 잘못된 값은 2로 끝납니다. 예: `--fail-on nope` → `fixplan: unknown --fail-on value 'nope' (use kev, fixable, any)`, 없는 경로 → `fixplan: path not found or not a directory: nowhere`.
 
+이미 검토해서 넘어가기로 한 알림은 `--ignore` 로 뺄 수 있습니다. 같은 알림의 별칭(CVE ↔ GHSA 등)도 함께 빠집니다.
+```bash
+node src/cli.ts scan examples/mixed-shop --offline --fail-on kev --ignore CVE-2021-21315 > /dev/null; echo "exit=$?"
+```
+```
+exit=0
+```
+보고서 요약 줄 끝에 ` · ignored: 1` 이 붙고 `## Ignored` 절에 `- ignored: GHSA-2m8v-572m-ff2v (npm systeminformation 5.3.0, web/package-lock.json)` 처럼 남습니다. 주의할 점:
+- 정확히 일치하는 ID만 제외합니다(대소문자 무시). 일부만 쓴 `GHSA-2m8v` 는 아무것도 빼지 않습니다. 경고는 stderr 가 아니라 보고서 끝 `## Warnings` 절(JSON 은 `warnings` 배열)에 `- --ignore GHSA-2m8v: matched no advisory in this scan` 으로 남고, `## Ignored` 절은 `- none (see warnings)` 가 됩니다. 경고 없이 효과도 없으면 `- none (no effect on the result)` 입니다.
+- 만료일이 없습니다. 제외 목록은 직접 관리하세요.
+- 제외한 알림은 계산에서 빠지므로 `minimal_fix` 가 낮아질 수 있습니다(그 알림이 요구하던 버전까지 올리지 않음). 현재 버전에는 해당하지 않고 후보 버전 검사에만 쓰이는 알림(예: lodash `GHSA-f23m-r3pf-42rh`)도 경고 없이 `## Ignored` 절에 `— affects candidate versions only` 로 남고 `ignored: N` 에 셉니다. 이 스냅샷에서 `GHSA-f23m-r3pf-42rh` 하나만 빼면 lodash 최소 버전은 4.18.1 그대로이고(4.18.0 은 레지스트리에서 deprecated 라 후보에서 빠집니다), `still_affected_by` 만 비게 됩니다. `--ignore GHSA-r5fr-rjxr-66jc,GHSA-f23m-r3pf-42rh` 처럼 함께 빼면 최소 버전이 4.17.23 으로 낮아집니다.
+- 형식에 맞지 않는 값(`--ignore nope`)은 `fixplan: invalid --ignore id 'nope' (e.g. GHSA-xxxx-xxxx-xxxx, CVE-2021-21315)` 와 종료 코드 2.
+
 ### 시나리오 4. 기계가 읽는 JSON
-`--format json`이면 항목마다 `verdict`, `minimal_fix`, `naive_fix`, `still_affected_by`, `command`, `runtime`이 들어 있습니다. CVE가 없는 알림의 EPSS는 `0`이 아니라 `"unknown"`입니다. 같은 입력이면 출력이 바이트 단위로 같습니다(시각 등 변하는 값 없음).
+`--format json`이면 항목마다 `verdict`, `minimal_fix`, `naive_fix`, `still_affected_by`, `command`, `runtime`이 들어 있습니다. `--ignore` 를 줬을 때만 최상위 `ignored` 배열(제외된 알림의 `id`·`aliases`·패키지·lockfile, 후보 버전에만 영향을 줬다면 `"affects": "candidate-versions-only"`)이 추가됩니다. CVE가 없는 알림의 EPSS는 `0`이 아니라 `"unknown"`입니다. 같은 입력이면 출력이 바이트 단위로 같습니다(시각 등 변하는 값 없음).
 
 ## 설정
 - 설정 파일과 API 키는 없습니다.
@@ -161,6 +175,8 @@ flowchart TD
 ## 지원 범위와 로드맵
 **M1(0.1.0부터)**: Composer·PyPI·npm, 판정 4가지, naive fix 비교, 런타임 차단 설명, KEV·EPSS 정렬, Markdown·JSON, `--fail-on`.
 
+**0.2.0**: `--ignore <ID>` — ID·별칭으로 알림 제외(CLI 전용, 사유·만료일 없음. 사유를 적는 `--waivers` 는 M2).
+
 한계(정직하게):
 - 명령은 제안일 뿐이고, 전이 의존성용 명령(`composer update --with`, npm `overrides`, `uv lock --upgrade-package`)은 실제 프로젝트에서 실행해 보지 않았습니다.
 - 코드가 그 취약 함수를 실제로 부르는지(도달성)는 보지 않습니다.
@@ -184,7 +200,7 @@ flowchart TD
 ## 개발·기여
 ```bash
 npm ci
-npm test            # 147 tests, 네트워크 없음
+npm test            # 187 tests, 네트워크 없음
 npm run typecheck
 npm run compile      # src/ 를 고친 뒤 dist/ 를 다시 만듦(dist/ 는 저장소에 커밋됨)
 ```
