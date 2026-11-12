@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 — 2026-11-12
+
+- `--lang en|ko` on every command: the help, error messages (including option-parsing errors), the `wrote <file>` notice and the Markdown report are available in English and Korean. Resolution order: `--lang` > `FIXPLAN_LANG` > `LC_ALL` > `LC_MESSAGES` > `LANG`; a value starting with `ko` means Korean, anything else means English. An unknown `--lang` value exits 2.
+- Unchanged: the JSON report (byte for byte, in either language), verdict names, ecosystem names, suggested commands, and the per-finding evidence sentences (`why`, `note`, warnings), which stay English in Markdown too. With no `--lang` and an English environment, output is identical to 0.2.0. Scripts that compare Markdown text under a Korean locale should use `--format json` or `--lang en`.
+- Tests: the test helpers pin `FIXPLAN_LANG=en`, so the suite passes under any locale. New `test/i18n.test.ts`.
+
 ## 0.2.0 — 2026-11-11
 
 - `--ignore <id>` on `fixplan scan`: skip an advisory by OSV id or alias (GHSA, CVE, PYSEC). Repeatable or comma separated, case-insensitive, exact match only.
