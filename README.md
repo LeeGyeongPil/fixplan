@@ -49,7 +49,7 @@ Scanned 3 lockfile(s), 7 package(s). Runtimes: php 8.1 (composer.json config.pla
 | 3 | Packagist guzzlehttp/guzzle | 7.4.0 | fixable-in-major | 7.15.2 | 14 (HIGH) | no | 1.99% | `composer require "guzzlehttp/guzzle:^7.15.2"` |
 | 4 | PyPI jinja2 | 3.1.2 | fixable-in-major | 3.1.6 | 5 (MODERATE) | no | 0.98% | `uv add "jinja2>=3.1.6"` |
 ```
-(The output above is the first part. Per-package evidence follows under `## Details`.)
+(The output above is the first part. Per-package evidence follows under `## Details`. Under a Korean locale the same command prints Korean labels; add `--lang en` for exactly this text, and pass flags through npm as `npm start -- --lang ko`. The screenshots in this README were taken with `FIXPLAN_LANG=ko` set for the Korean README.)
 
 How to read it:
 - The table is ordered **KEV (list of confirmed real-world exploitation) → EPSS (estimated probability of future exploitation) → severity → difficulty of the fix**. The top row is the most urgent.
@@ -73,6 +73,7 @@ How to read it:
 | `--out <file>` | Save the report to a file | `--out plan.md` |
 | `--fail-on kev,fixable,any` | Exit code 1 if any item matches the condition (for CI) | `--fail-on kev` |
 | `--ignore <ID>` | Exclude an alert by ID or alias (GHSA, CVE, PYSEC). Repeatable or comma-separated | `--ignore CVE-2021-21315` |
+| `--lang en\|ko` | Language of messages and the Markdown report (default: from the environment, else English) | `--lang ko` |
 | `--verbose` | Progress to stderr | |
 | `--snapshot <dir>` | Use a different snapshot folder (together with `--offline`) | |
 | `--osv-url` `--kev-url` `--epss-url` | Change data URLs | |
@@ -97,9 +98,9 @@ node src/cli.ts scan examples/mixed-shop --offline | sed -n '38,44p'
 *Even the highest fixed version the alerts point to (4.18.0) is hit by another alert (GHSA-f23m-r3pf-42rh), so the minimal version is 4.18.1.*
 
 ### Scenario 2. An upgrade the runtime cannot accept
-Suppose you are on Python 3.6.
+Suppose you are on Python 3.6. (The `사유` in the pattern is the Korean label of the `why` line, so the same command works under either output language.)
 ```bash
-node src/cli.ts scan examples/mixed-shop --offline --python 3.6 | grep -E 'jinja2 \||why:'
+node src/cli.ts scan examples/mixed-shop --offline --python 3.6 | grep -E 'jinja2 \||^- (why|사유):'
 ```
 ```
 | 4 | PyPI jinja2 | 3.1.2 | runtime-blocked | 3.1.6 | 5 (MODERATE) | no | 0.98% | upgrade runtime first |
@@ -142,7 +143,8 @@ With `--format json`, each item contains `verdict`, `minimal_fix`, `naive_fix`, 
 
 ## Configuration
 - There are no config files or API keys.
-- Environment variables: `FIXPLAN_OSV_URL` (default `https://api.osv.dev`), `FIXPLAN_KEV_URL`, `FIXPLAN_EPSS_URL` (default `https://api.first.org/data/v1/epss`).
+- **Language**: `--lang en|ko` > `FIXPLAN_LANG` > `LC_ALL` > `LC_MESSAGES` > `LANG` (a value starting with `ko`, such as `ko_KR.UTF-8`, means Korean; anything else, including empty, `C` and `POSIX`, means English). It covers the help, error messages and the Markdown report. The JSON report, verdict names, commands and the evidence sentences of each finding (`why`, `note`, warnings) and the runtime source text (for example `package.json engines.node lower bound (estimated)`) are always the same English text. For scripts that compare Markdown text, use `--format json` or `--lang en`.
+- Environment variables: `FIXPLAN_LANG`, `FIXPLAN_OSV_URL` (default `https://api.osv.dev`), `FIXPLAN_KEV_URL`, `FIXPLAN_EPSS_URL` (default `https://api.first.org/data/v1/epss`).
 - **Practice mock mode (`--offline`)**: reads a snapshot made by taking real responses downloaded from public sources on 2026-11-10 and trimming them down to just the example packages (lodash, systeminformation, guzzle, jinja2). It does not print fixed output; the same calculation engine as live mode runs on this data. Differences: alerts published since then are absent, and a package not in the snapshot only produces a "not covered by the offline snapshot" warning. For sources and licenses see [snapshot/NOTICE.md](snapshot/NOTICE.md).
 - With `--offline`, packages not in the snapshot are not included in the `--fail-on` decision ("not checked"). So exit code 0 from `--offline --fail-on` does not mean "safe". Use live mode for a CI gate. Behavior on Linux and Node 24.10 is verified by a CI matrix.
 - **Live mode**: calls OSV, the npm, PyPI and Packagist registries, CISA KEV and FIRST EPSS directly. These are public APIs and can be slow, so the per-request timeout is set to 120 seconds. The request shape in code has been tested and the npm and PyPI registries were actually called, but the whole flow has not been measured for real yet.
@@ -175,6 +177,8 @@ If you need automatic PRs, look at [Dependabot](https://docs.github.com/en/code-
 ## Supported scope and roadmap
 **M1 (from 0.1.0)**: Composer, PyPI, npm, 4 verdicts, naive fix comparison, runtime-block explanation, KEV and EPSS sorting, Markdown and JSON, `--fail-on`.
 
+**0.3.0**: `--lang en|ko` — English and Korean messages and Markdown report (JSON output unchanged).
+
 **0.2.0**: `--ignore <ID>` — exclude alerts by ID or alias (CLI only, no reason or expiry. `--waivers`, which records reasons, is M2).
 
 Limitations (honestly):
@@ -200,7 +204,7 @@ Limitations (honestly):
 ## Development and contributing
 ```bash
 npm ci
-npm test            # 187 tests, no network
+npm test            # 204 tests, no network
 npm run typecheck
 npm run compile      # Rebuild dist/ after changing src/ (dist/ is committed to the repo)
 ```
