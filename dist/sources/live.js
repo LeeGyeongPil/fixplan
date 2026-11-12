@@ -1,3 +1,13 @@
+// live 데이터 소스: 공개 API 를 직접 부른다(키 불필요).
+//  - OSV        POST {osv}/v1/query  {"package":{...}} → 패키지 전체 알림, next_page_token 이 있으면 반복
+//               실패하면 POST /v1/querybatch(ID 만) + GET /v1/vulns/{id} 로 대신한다
+//  - npm        GET  {npm}/<name>   Accept: application/vnd.npm.install-v1+json (corgi, engines 포함)
+//  - PyPI       GET  {pypi}/pypi/<name>/json
+//  - Packagist  GET  {packagist}/p2/<vendor>/<pkg>.json
+//  - KEV        GET  {kev}  (CISA 피드 JSON)
+//  - EPSS       GET  {epss}?cve=a,b,...  — 한 번에 100개까지
+// fetch 는 주입할 수 있다(테스트는 가짜 fetch 로 요청 모양만 확인한다).
+import { messages } from "../i18n.js";
 import { npmToRegistry } from "./npm-registry.js";
 import { packagistToRegistry } from "./packagist.js";
 import { pypiToRegistry } from "./pypi.js";
@@ -16,12 +26,14 @@ export class LiveSource {
     urls;
     timeoutMs;
     log;
+    m;
     kevCache = null;
     constructor(opts = {}) {
         this.fetchFn = opts.fetch ?? globalThis.fetch;
         this.urls = { ...DEFAULT_URLS, ...stripUndefined(opts.urls ?? {}) };
         this.timeoutMs = opts.timeoutMs ?? 120_000;
         this.log = opts.log ?? (() => { });
+        this.m = opts.messages ?? messages("en");
     }
     describe() {
         return { mode: "live", sources: { ...this.urls } };
@@ -33,12 +45,12 @@ export class LiveSource {
             res = await this.fetchFn(url, { ...init, signal: AbortSignal.timeout(this.timeoutMs) });
         }
         catch (e) {
-            throw new FixplanError(`network error: ${url} (${e.message})`);
+            throw new FixplanError(this.m.networkError(url, e.message));
         }
         if (res.status === 404)
             return null;
         if (!res.ok)
-            throw new FixplanError(`HTTP ${res.status} from ${url}`);
+            throw new FixplanError(this.m.httpStatus(res.status, url));
         return res.json();
     }
     post(url, body) {
@@ -50,7 +62,7 @@ export class LiveSource {
             return await this.osvQuery(pkg);
         }
         catch (e) {
-            this.log(`osv /v1/query failed for ${name} (${e.message}); trying /v1/querybatch`);
+            this.log(this.m.osvQueryFallback(name, e.message));
             return this.osvQueryBatch(pkg);
         }
     }
@@ -63,7 +75,7 @@ export class LiveSource {
             out.push(...(res?.vulns ?? []));
             pageToken = res?.next_page_token;
         } while (pageToken);
-        this.log(`osv: ${pkg.ecosystem}/${pkg.name} → ${out.length} advisories`);
+        this.log(this.m.osvCount(pkg.ecosystem, pkg.name, out.length));
         return out;
     }
     async osvQueryBatch(pkg) {

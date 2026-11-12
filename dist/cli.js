@@ -4,36 +4,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { detectLang, envLang, LANGS, messages } from "./i18n.js";
 import { renderJson } from "./report/json.js";
 import { renderMarkdown } from "./report/markdown.js";
 import { scan } from "./scan.js";
 import { FixplanError } from "./sources/types.js";
-const HELP = `fixplan — turn vulnerability alerts into a fix plan (Composer · PyPI · npm)
-
-Usage:
-  fixplan scan [path=.] [options]
-  fixplan --version | --help
-
-Runtime (otherwise estimated from composer.json / package.json / pyproject.toml):
-  --php <ver>        e.g. 8.1
-  --node <ver>       e.g. 18
-  --python <ver>     e.g. 3.10
-
-Data:
-  --offline          replay the bundled snapshot (practice data recorded 2026-11-10, no network)
-  --snapshot <dir>   use another snapshot folder with --offline
-  --osv-url <url>    OSV API base           (env FIXPLAN_OSV_URL,  default https://api.osv.dev)
-  --kev-url <url>    CISA KEV JSON feed     (env FIXPLAN_KEV_URL)
-  --epss-url <url>   EPSS API               (env FIXPLAN_EPSS_URL, default https://api.first.org/data/v1/epss)
-  --verbose          progress lines on stderr
-
-Output:
-  --format md|json   default md
-  --out <file>       write the report to a file instead of stdout
-  --fail-on <list>   exit 1 if any finding matches: kev, fixable, any (comma separated)
-  --ignore <id>      skip an advisory by ID or alias (GHSA, CVE, PYSEC; repeatable or comma separated)
-
-Exit codes: 0 ok · 1 --fail-on matched · 2 input or network error`;
 const FAIL_ON = ["kev", "fixable", "any"];
 const IGNORE_ID = /^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9._:-]+$/;
 function toolVersion() {
@@ -51,6 +26,40 @@ export function failOnMatched(result, conditions) {
         return result.findings.some((f) => f.verdict === "fixable-in-major" || f.verdict === "major-upgrade");
     });
 }
+/** argv 에서 마지막 --lang 값을 찾는다(검증은 parseArgs 뒤에). 없으면 undefined */
+function peekLang(argv) {
+    let found;
+    for (let i = 0; i < argv.length; i++) {
+        const a = argv[i];
+        if (a === "--")
+            break;
+        if (a === "--lang")
+            found = argv[i + 1];
+        else if (a.startsWith("--lang="))
+            found = a.slice("--lang=".length);
+    }
+    return found;
+}
+/** parseArgs 오류를 code 로 구분해 옵션 이름만 뽑아 현지화한다. 모르는 code 는 원문 유지 */
+function parseArgsMessage(err, lang) {
+    // English keeps Node's own message so that default output stays byte-identical to 0.2.0
+    if (lang === "en")
+        return err.message;
+    const m = messages(lang);
+    const name = err.message.match(/'([^']+)'/)?.[1]?.replace(/ <value>$/, "");
+    if (!name)
+        return err.message;
+    switch (err.code) {
+        case "ERR_PARSE_ARGS_UNKNOWN_OPTION":
+            return m.unknownOption(name);
+        case "ERR_PARSE_ARGS_INVALID_OPTION_VALUE":
+            return /does not take/i.test(err.message) ? m.optionTakesNoValue(name) : m.optionNeedsValue(name);
+        case "ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL":
+            return m.unexpectedArgument(name);
+        default:
+            return err.message;
+    }
+}
 const defaultIo = {
     stdout: (s) => process.stdout.write(s),
     stderr: (s) => process.stderr.write(s),
@@ -58,6 +67,8 @@ const defaultIo = {
 };
 /** CLI 본체. 종료 코드를 돌려준다(테스트에서 프로세스를 띄우지 않고 부를 수 있다) */
 export async function main(argv, io = defaultIo) {
+    // 언어는 parseArgs 오류 문구에도 필요하므로 파싱 전에 --lang 값을 미리 엿본다
+    let lang = detectLang(peekLang(argv), io.env);
     try {
         const { values, positionals } = parseArgs({
             args: argv,
@@ -76,13 +87,20 @@ export async function main(argv, io = defaultIo) {
                 out: { type: "string" },
                 "fail-on": { type: "string" },
                 ignore: { type: "string", multiple: true },
+                lang: { type: "string" },
                 verbose: { type: "boolean", default: false },
                 help: { type: "boolean", short: "h", default: false },
                 version: { type: "boolean", short: "v", default: false },
             },
         });
+        // --lang 값 검사: en|ko 외에는 종료 코드 2 (오류 문구는 환경 언어로)
+        if (values.lang !== undefined && !LANGS.includes(values.lang)) {
+            lang = envLang(io.env);
+            throw new FixplanError(messages(lang).unknownLang(values.lang));
+        }
+        const m = messages(lang);
         if (values.help) {
-            io.stdout(HELP + "\n");
+            io.stdout(m.help + "\n");
             return 0;
         }
         if (values.version) {
@@ -91,31 +109,31 @@ export async function main(argv, io = defaultIo) {
         }
         const [command, path = ".", ...extra] = positionals;
         if (command !== "scan")
-            throw new FixplanError(command ? `unknown command '${command}' (try: fixplan scan .)` : "missing command (try: fixplan scan .)");
+            throw new FixplanError(command ? m.unknownCommand(command) : m.missingCommand);
         if (extra.length)
-            throw new FixplanError(`unexpected argument '${extra[0]}'`);
+            throw new FixplanError(m.unexpectedArgument(extra[0]));
         if (values.format !== "md" && values.format !== "json")
-            throw new FixplanError(`unknown --format '${values.format}' (use md or json)`);
+            throw new FixplanError(m.unknownFormat(values.format));
         // --fail-on 값 검사: 모르는 값이면 실행 전에 종료 코드 2
         const failOn = [];
         if (values["fail-on"] !== undefined) {
             for (const raw of values["fail-on"].split(",").map((s) => s.trim()).filter(Boolean)) {
                 if (!FAIL_ON.includes(raw))
-                    throw new FixplanError(`unknown --fail-on value '${raw}' (use kev, fixable, any)`);
+                    throw new FixplanError(m.unknownFailOn(raw));
                 failOn.push(raw);
             }
             if (failOn.length === 0)
-                throw new FixplanError("--fail-on needs a value (kev, fixable, any)");
+                throw new FixplanError(m.failOnNeedsValue);
         }
         // --ignore 값 검사: 여러 번·쉼표 모두 허용, 형식이 틀리면 실행 전에 종료 코드 2
         const ignore = [];
         for (const group of values.ignore ?? []) {
             const parts = group.split(",").map((s) => s.trim()).filter(Boolean);
             if (parts.length === 0)
-                throw new FixplanError(`invalid --ignore id '${group}' (e.g. GHSA-xxxx-xxxx-xxxx, CVE-2021-21315)`);
+                throw new FixplanError(m.invalidIgnore(group));
             for (const id of parts) {
                 if (!IGNORE_ID.test(id))
-                    throw new FixplanError(`invalid --ignore id '${id}' (e.g. GHSA-xxxx-xxxx-xxxx, CVE-2021-21315)`);
+                    throw new FixplanError(m.invalidIgnore(id));
                 if (!ignore.includes(id))
                     ignore.push(id);
             }
@@ -124,7 +142,7 @@ export async function main(argv, io = defaultIo) {
         for (const [flag, example] of [["php", "8.1"], ["node", "18"], ["python", "3.10"]]) {
             const v = values[flag];
             if (v !== undefined && !/^\d+(\.\d+){0,2}$/.test(v))
-                throw new FixplanError(`--${flag} expects a version like ${example} (got '${v}')`);
+                throw new FixplanError(m.runtimeValue(flag, example, v));
         }
         const result = await scan({
             path,
@@ -137,18 +155,19 @@ export async function main(argv, io = defaultIo) {
                 epss: values["epss-url"] ?? io.env.FIXPLAN_EPSS_URL,
             },
             ignore: ignore.length ? ignore : undefined,
+            lang,
             fetch: io.fetch,
             log: values.verbose ? (line) => io.stderr(`fixplan: ${line}\n`) : undefined,
         });
-        const report = values.format === "json" ? renderJson(result, toolVersion()) : renderMarkdown(result);
+        const report = values.format === "json" ? renderJson(result, toolVersion()) : renderMarkdown(result, lang);
         if (values.out) {
             try {
                 writeFileSync(values.out, report);
             }
             catch (e) {
-                throw new FixplanError(`cannot write --out file ${values.out}: ${e.code ?? e.message} (create the folder first)`);
+                throw new FixplanError(m.cannotWriteOut(values.out, e.code ?? e.message));
             }
-            io.stderr(`fixplan: wrote ${values.out}\n`);
+            io.stderr(`fixplan: ${m.wroteFile(values.out)}\n`);
         }
         else {
             io.stdout(report);
@@ -158,8 +177,12 @@ export async function main(argv, io = defaultIo) {
     catch (e) {
         // 입력·네트워크 오류는 한 줄로 알리고 2 로 끝낸다
         const err = e;
-        if (e instanceof FixplanError || err.code?.startsWith("ERR_PARSE_ARGS")) {
+        if (e instanceof FixplanError) {
             io.stderr(`fixplan: ${err.message}\n`);
+            return 2;
+        }
+        if (err.code?.startsWith("ERR_PARSE_ARGS")) {
+            io.stderr(`fixplan: ${parseArgsMessage(err, lang)}\n`);
             return 2;
         }
         io.stderr(`fixplan: unexpected error: ${err.stack ?? err.message}\n`);

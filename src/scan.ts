@@ -15,6 +15,7 @@ import { advisoryView, cvesOf, rankFindings } from "./priority.ts";
 import { detectNode, detectPhp, detectPython, type RuntimeFlags } from "./runtime/detect.ts";
 import { LiveSource, type DEFAULT_URLS } from "./sources/live.ts";
 import { SnapshotSource } from "./sources/snapshot.ts";
+import { messages, type Lang } from "./i18n.ts";
 import { FixplanError, type DataSource, type SourceDescription } from "./sources/types.ts";
 import type { Ecosystem, Finding, OsvRecord, Pkg, RegistryInfo, RuntimeInfo, Verdict } from "./types.ts";
 import { schemeFor } from "./versions/index.ts";
@@ -35,6 +36,8 @@ export interface ScanOptions {
   ignore?: string[];
   /** 동시에 조회할 패키지 수(공개 API 에 부담을 덜 주도록 작게) */
   concurrency?: number;
+  /** language of error messages (default en) */
+  lang?: Lang;
 }
 
 export interface LockfileSummary {
@@ -100,15 +103,16 @@ async function mapLimit<T, R>(items: T[], n: number, fn: (item: T) => Promise<R>
 }
 
 export async function scan(opts: ScanOptions): Promise<ScanResult> {
+  const m = messages(opts.lang ?? "en");
   const root = resolve(opts.path);
-  if (!existsSync(root) || !statSync(root).isDirectory()) throw new FixplanError(`path not found or not a directory: ${opts.path}`);
+  if (!existsSync(root) || !statSync(root).isDirectory()) throw new FixplanError(m.pathNotFound(opts.path));
   const flags = opts.runtimes ?? {};
   const warnings: string[] = [];
 
   // 1) lockfile 찾기·읽기. 런타임은 lockfile 이 있는 폴더의 매니페스트에서 추정한다
   const found = findLockfiles(root);
   if (found.length === 0) {
-    throw new FixplanError(`no supported lockfile (composer.lock, package-lock.json, uv.lock, requirements.txt) in ${opts.path}`);
+    throw new FixplanError(m.noLockfile(opts.path));
   }
   const lockfiles: LockfileSummary[] = [];
   const runtimeByLockfile = new Map<string, RuntimeInfo>();
@@ -133,7 +137,7 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
         runtime = detectPython(dir, flags);
       }
     } catch (e) {
-      throw new FixplanError(`cannot read ${lf.rel}: ${(e as Error).message}`);
+      throw new FixplanError(m.cannotRead(lf.rel, (e as Error).message));
     }
     warnings.push(...parsed.warnings);
     pkgs.push(...parsed.packages);
@@ -143,15 +147,15 @@ export async function scan(opts: ScanOptions): Promise<ScanResult> {
 
   // 2) 데이터 소스: --offline 이면 스냅샷(네트워크 0), 아니면 공개 API
   const source: DataSource = opts.offline
-    ? new SnapshotSource(opts.snapshotDir ?? DEFAULT_SNAPSHOT)
-    : new LiveSource({ fetch: opts.fetch, urls: opts.urls, log: opts.log });
+    ? new SnapshotSource(opts.snapshotDir ?? DEFAULT_SNAPSHOT, m)
+    : new LiveSource({ fetch: opts.fetch, urls: opts.urls, log: opts.log, messages: m });
   const concurrency = opts.concurrency ?? 4;
 
   // 3) 패키지(이름) 단위로 알림을 한 번씩만 가져온다
   const keyOf = (eco: Ecosystem, name: string) => `${eco}\u0000${schemeFor(eco).normalizeName(name)}`;
   const uniqueNames = [...new Map(pkgs.map((p) => [keyOf(p.ecosystem, p.name), p])).values()];
   const advisoryLists = await mapLimit(uniqueNames, concurrency, async (p) => {
-    opts.log?.(`advisories: ${p.ecosystem} ${p.name}`);
+    opts.log?.(m.progressAdvisories(p.ecosystem, p.name));
     return source.advisoriesFor(p.ecosystem, p.name);
   });
   const advisoriesByName = new Map<string, OsvRecord[]>();

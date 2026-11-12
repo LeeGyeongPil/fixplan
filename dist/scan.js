@@ -15,6 +15,7 @@ import { advisoryView, cvesOf, rankFindings } from "./priority.js";
 import { detectNode, detectPhp, detectPython } from "./runtime/detect.js";
 import { LiveSource } from "./sources/live.js";
 import { SnapshotSource } from "./sources/snapshot.js";
+import { messages } from "./i18n.js";
 import { FixplanError } from "./sources/types.js";
 import { schemeFor } from "./versions/index.js";
 /** 저장소에 든 기본 스냅샷(src/ 와 dist/ 어디서 실행해도 같은 위치) */
@@ -48,15 +49,16 @@ async function mapLimit(items, n, fn) {
     return out;
 }
 export async function scan(opts) {
+    const m = messages(opts.lang ?? "en");
     const root = resolve(opts.path);
     if (!existsSync(root) || !statSync(root).isDirectory())
-        throw new FixplanError(`path not found or not a directory: ${opts.path}`);
+        throw new FixplanError(m.pathNotFound(opts.path));
     const flags = opts.runtimes ?? {};
     const warnings = [];
     // 1) lockfile 찾기·읽기. 런타임은 lockfile 이 있는 폴더의 매니페스트에서 추정한다
     const found = findLockfiles(root);
     if (found.length === 0) {
-        throw new FixplanError(`no supported lockfile (composer.lock, package-lock.json, uv.lock, requirements.txt) in ${opts.path}`);
+        throw new FixplanError(m.noLockfile(opts.path));
     }
     const lockfiles = [];
     const runtimeByLockfile = new Map();
@@ -85,7 +87,7 @@ export async function scan(opts) {
             }
         }
         catch (e) {
-            throw new FixplanError(`cannot read ${lf.rel}: ${e.message}`);
+            throw new FixplanError(m.cannotRead(lf.rel, e.message));
         }
         warnings.push(...parsed.warnings);
         pkgs.push(...parsed.packages);
@@ -94,14 +96,14 @@ export async function scan(opts) {
     }
     // 2) 데이터 소스: --offline 이면 스냅샷(네트워크 0), 아니면 공개 API
     const source = opts.offline
-        ? new SnapshotSource(opts.snapshotDir ?? DEFAULT_SNAPSHOT)
-        : new LiveSource({ fetch: opts.fetch, urls: opts.urls, log: opts.log });
+        ? new SnapshotSource(opts.snapshotDir ?? DEFAULT_SNAPSHOT, m)
+        : new LiveSource({ fetch: opts.fetch, urls: opts.urls, log: opts.log, messages: m });
     const concurrency = opts.concurrency ?? 4;
     // 3) 패키지(이름) 단위로 알림을 한 번씩만 가져온다
     const keyOf = (eco, name) => `${eco}\u0000${schemeFor(eco).normalizeName(name)}`;
     const uniqueNames = [...new Map(pkgs.map((p) => [keyOf(p.ecosystem, p.name), p])).values()];
     const advisoryLists = await mapLimit(uniqueNames, concurrency, async (p) => {
-        opts.log?.(`advisories: ${p.ecosystem} ${p.name}`);
+        opts.log?.(m.progressAdvisories(p.ecosystem, p.name));
         return source.advisoriesFor(p.ecosystem, p.name);
     });
     const advisoriesByName = new Map();

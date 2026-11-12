@@ -2,6 +2,7 @@
 // 스냅샷은 2026-11-10 에 공개 API 에서 받은 실제 응답을 잘라 담은 것이다(snapshot/NOTICE.md).
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { messages } from "../i18n.js";
 import { schemeFor } from "../versions/index.js";
 import { normalizePypiName } from "../versions/pep440.js";
 import { npmToRegistry } from "./npm-registry.js";
@@ -17,10 +18,10 @@ export function registryFileName(ecosystem, name) {
 export class SnapshotSource {
     dir;
     manifest;
-    constructor(dir) {
+    constructor(dir, m = messages("en")) {
         const manifestPath = join(dir, "manifest.json");
         if (!existsSync(manifestPath))
-            throw new FixplanError(`snapshot not found: ${manifestPath}`);
+            throw new FixplanError(m.snapshotNotFound(manifestPath));
         this.dir = dir;
         this.manifest = this.readJson("manifest.json");
     }

@@ -2,6 +2,7 @@
 // 스냅샷은 2026-11-10 에 공개 API 에서 받은 실제 응답을 잘라 담은 것이다(snapshot/NOTICE.md).
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { messages, type Messages } from "../i18n.ts";
 import type { Ecosystem, OsvRecord, RegistryInfo } from "../types.ts";
 import { schemeFor } from "../versions/index.ts";
 import { normalizePypiName } from "../versions/pep440.ts";
@@ -28,9 +29,9 @@ export class SnapshotSource implements DataSource {
   private readonly dir: string;
   private readonly manifest: Manifest;
 
-  constructor(dir: string) {
+  constructor(dir: string, m: Messages = messages("en")) {
     const manifestPath = join(dir, "manifest.json");
-    if (!existsSync(manifestPath)) throw new FixplanError(`snapshot not found: ${manifestPath}`);
+    if (!existsSync(manifestPath)) throw new FixplanError(m.snapshotNotFound(manifestPath));
     this.dir = dir;
     this.manifest = this.readJson("manifest.json") as Manifest;
   }

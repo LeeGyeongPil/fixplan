@@ -1,4 +1,7 @@
 // 테스트 공용 도우미: 저장소 경로, 동봉 스냅샷으로 한 패키지의 계획을 세우기.
+// 출력 언어는 import 시점에 영어로 고정한다. 개발자 로케일(LANG=ko_KR.UTF-8)이어도,
+// node --test 로 파일을 직접 실행해도, 영어 단언과 e2e 로 띄우는 CLI 가 같은 결과를 낸다.
+process.env.FIXPLAN_LANG = "en";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

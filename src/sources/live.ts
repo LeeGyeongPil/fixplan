@@ -7,6 +7,7 @@
 //  - KEV        GET  {kev}  (CISA 피드 JSON)
 //  - EPSS       GET  {epss}?cve=a,b,...  — 한 번에 100개까지
 // fetch 는 주입할 수 있다(테스트는 가짜 fetch 로 요청 모양만 확인한다).
+import { messages, type Messages } from "../i18n.ts";
 import type { Ecosystem, OsvRecord, RegistryInfo } from "../types.ts";
 import { npmToRegistry } from "./npm-registry.ts";
 import { packagistToRegistry } from "./packagist.ts";
@@ -31,6 +32,8 @@ export interface LiveOptions {
   timeoutMs?: number;
   /** 진행 상황 한 줄 로그(--verbose) */
   log?: (line: string) => void;
+  /** message table for errors and progress lines (default English) */
+  messages?: Messages;
 }
 
 export class LiveSource implements DataSource {
@@ -38,6 +41,7 @@ export class LiveSource implements DataSource {
   private readonly urls: typeof DEFAULT_URLS;
   private readonly timeoutMs: number;
   private readonly log: (line: string) => void;
+  private readonly m: Messages;
   private kevCache: Promise<Set<string>> | null = null;
 
   constructor(opts: LiveOptions = {}) {
@@ -45,6 +49,7 @@ export class LiveSource implements DataSource {
     this.urls = { ...DEFAULT_URLS, ...stripUndefined(opts.urls ?? {}) };
     this.timeoutMs = opts.timeoutMs ?? 120_000;
     this.log = opts.log ?? (() => {});
+    this.m = opts.messages ?? messages("en");
   }
 
   describe(): SourceDescription {
@@ -57,10 +62,10 @@ export class LiveSource implements DataSource {
     try {
       res = await this.fetchFn(url, { ...init, signal: AbortSignal.timeout(this.timeoutMs) });
     } catch (e) {
-      throw new FixplanError(`network error: ${url} (${(e as Error).message})`);
+      throw new FixplanError(this.m.networkError(url, (e as Error).message));
     }
     if (res.status === 404) return null;
-    if (!res.ok) throw new FixplanError(`HTTP ${res.status} from ${url}`);
+    if (!res.ok) throw new FixplanError(this.m.httpStatus(res.status, url));
     return res.json();
   }
 
@@ -73,7 +78,7 @@ export class LiveSource implements DataSource {
     try {
       return await this.osvQuery(pkg);
     } catch (e) {
-      this.log(`osv /v1/query failed for ${name} (${(e as Error).message}); trying /v1/querybatch`);
+      this.log(this.m.osvQueryFallback(name, (e as Error).message));
       return this.osvQueryBatch(pkg);
     }
   }
@@ -87,7 +92,7 @@ export class LiveSource implements DataSource {
       out.push(...(res?.vulns ?? []));
       pageToken = res?.next_page_token;
     } while (pageToken);
-    this.log(`osv: ${pkg.ecosystem}/${pkg.name} → ${out.length} advisories`);
+    this.log(this.m.osvCount(pkg.ecosystem, pkg.name, out.length));
     return out;
   }
 
